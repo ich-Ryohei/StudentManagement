@@ -31,13 +31,13 @@ public class Application {
      }
 
   @GetMapping("/studentInfo")
-  public String getstudentInfo(){
+  public String getStudentInfo(){
    return stMap.get("name")+" "+stMap.get("age")+"歳"+
           name2+" "+age2+"歳";
   }
 
   @PostMapping("/studentInfo")
-  public void setstudentInfo(String name,String age,String age2,String name2){
+  public void setStudentInfo(String name,String age,String age2,String name2){
     stMap.put("name",name);
     stMap.put("age",age);
     this.name2=name2;
