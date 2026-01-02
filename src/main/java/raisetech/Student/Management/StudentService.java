@@ -9,6 +9,7 @@ import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.data.Student_Courses;
 import raisetech.Student.Management.repository.StudentRepository;
 
+
 @Service
 public class StudentService {
   private StudentRepository repository;
@@ -39,7 +40,7 @@ public class StudentService {
     //抽出したリストをコントローラーに返す。
     List<Student_Courses>courses=repository.searchCourses();
     return courses.stream()
-        .filter(course->course.getCourseName().equals("JAVA"))
+        .filter(course->course.getCourseName().toUpperCase().equals("JAVA"))
         .collect(Collectors.toList());
   }
 
