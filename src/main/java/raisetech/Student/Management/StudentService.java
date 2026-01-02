@@ -3,11 +3,13 @@ package raisetech.Student.Management;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.data.Student_Courses;
 import raisetech.Student.Management.repository.StudentRepository;
+
 
 @Service
 public class StudentService {
@@ -39,7 +41,7 @@ public class StudentService {
     //抽出したリストをコントローラーに返す。
     List<Student_Courses>courses=repository.searchCourses();
     return courses.stream()
-        .filter(course->course.getCourseName().equals("JAVA"))
+        .filter(course->course.getCourseName()!=null && course.getCourseName().toUpperCase().equals("JAVA"))
         .collect(Collectors.toList());
   }
 
