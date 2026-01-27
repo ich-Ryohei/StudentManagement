@@ -10,14 +10,16 @@ import raisetech.Student.Management.domain.StudentDetail;
 
 @Component
 public class StudentConverter {
-  public List<StudentDetail> convertStudentDetails(List<Student> students, List<StudentsCourses> studentCourses) {
-    List<StudentDetail>studentDetails=new ArrayList<>();
+
+  public List<StudentDetail> convertStudentDetails(List<Student> students,
+      List<StudentsCourses> studentCourses) {
+    List<StudentDetail> studentDetails = new ArrayList<>();
     students.forEach(student -> {
       StudentDetail studentDetail = new StudentDetail();
       studentDetail.setStudent(student);
 
       List<StudentsCourses> convertStudentCourses = studentCourses.stream()
-          .filter(studentCourse -> student.getId()==(studentCourse.getStudentsId()))
+          .filter(studentCourse -> student.getId() == (studentCourse.getStudentsId()))
           .collect(Collectors.toList());
 
       studentDetail.setStudentsCourses(convertStudentCourses);

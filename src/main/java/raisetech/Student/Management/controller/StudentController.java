@@ -108,7 +108,8 @@ public class StudentController {
     List<Student> students = service.searchDeletedStudentList();
     List<StudentsCourses> studentCourses = service.searchStudentCourseList();
 
-    model.addAttribute("deletedStudentList", converter.convertStudentDetails(students, studentCourses));
+    model.addAttribute("deletedStudentList",
+        converter.convertStudentDetails(students, studentCourses));
     return "deletedStudentList";
   }
 
@@ -117,7 +118,8 @@ public class StudentController {
     List<Student> students = service.searchDeletedStudentList();
     List<StudentsCourses> studentCourses = service.searchStudentCourseList();
 
-    model.addAttribute("alterDeletedStudent", converter.convertStudentDetails(students, studentCourses));
+    model.addAttribute("alterDeletedStudent",
+        converter.convertStudentDetails(students, studentCourses));
     return "alterDeletedStudent";
   }
 

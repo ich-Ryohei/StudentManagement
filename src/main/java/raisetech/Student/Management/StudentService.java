@@ -47,7 +47,6 @@ public class StudentService {
 */
 
 
-
   public List<StudentsCourses> searchStudentCourseList() {
 
     //検索処理
@@ -72,7 +71,7 @@ public class StudentService {
 
   @Transactional
   public void insertStudentCourse(StudentDetail detail) {
-    int studentId=detail.getStudent().getId();
+    int studentId = detail.getStudent().getId();
 
     for (StudentsCourses sc : detail.getStudentsCourses()) {
       sc.setStudentsId(studentId);
