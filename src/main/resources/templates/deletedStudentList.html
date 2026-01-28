@@ -42,18 +42,18 @@
     <td th:text="${studentDetail.student.remark}">特になし</td>
     <td th:text="${studentDetail.student.isDeleted}">特になし</td>
     <td>
-      <div th:each="course : ${studentDetail.studentsCourses}">
+      <div th:each="course : ${studentDetail.studentCourse}">
         <span th:text="${course.courseName}">Javaコース</span>
       </div>
     </td>
 
 
-    <td th:each="course,stat:*{studentsCourses}">
-      <input type="hidden" th:field="*{studentsCourses[__${stat.index}__].id}" />
+    <td th:each="course,stat:*{studentCourse}">
+      <input type="hidden" th:field="*{studentCourse[__${stat.index}__].id}" />
 
       <label>受講していたコース名：</label>
       <input type="text"
-             th:field="*{studentsCourses[__${stat.index}__].courseName}"
+             th:field="*{studentCourse[__${stat.index}__].courseName}"
              required/>
     </td>
 

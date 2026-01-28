@@ -50,12 +50,12 @@
     <input type="text" id="remark" th:field="*{student.remark}" />
   </div>
 
-   <div th:each="course,stat:*{studentsCourses}">
-  <input type="hidden" th:field="*{studentsCourses[__${stat.index}__].id}" />
+   <div th:each="course,stat:*{studentCourse}">
+  <input type="hidden" th:field="*{studentCourse[__${stat.index}__].id}" />
 
   <label>受講するコース名：</label>
   <input type="text"
-         th:field="*{studentsCourses[__${stat.index}__].courseName}"
+         th:field="*{studentCourse[__${stat.index}__].courseName}"
          required/>
   </div>
 
@@ -67,7 +67,7 @@
 <!--
   <div>
     <label for="course_name">受講するコース名：</label>
-    <input type="text" id="course_name" th:field="*{studentsCourses[0].courseName}" required/>
+    <input type="text" id="course_name" th:field="*{studentCourse[0].courseName}" required/>
   </div>
 -->
 
