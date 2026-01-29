@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Student_Courses {
+public class StudentsCourses {
 
-    private String id;
-    private String studentsId;
+    private int id;
+    private int studentsId;
     private String courseName;
     private LocalDateTime startDayAt;
     private LocalDateTime endDayAt;
