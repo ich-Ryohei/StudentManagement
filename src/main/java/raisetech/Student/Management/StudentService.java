@@ -9,6 +9,7 @@ import raisetech.Student.Management.controller.converter.StudentConverter;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.data.StudentCourse;
 import raisetech.Student.Management.domain.StudentDetail;
+import raisetech.Student.Management.exception.TestException;
 import raisetech.Student.Management.repository.StudentRepository;
 
 /**
@@ -36,8 +37,9 @@ public class StudentService {
 
 
   public List<StudentDetail> searchStudentList() {
-    List<Student> studentList = repository.searchStudentList();
+    List<Student> studentList = repository.search();
     List<StudentCourse> studentCoursesList = repository.searchStudentCourseList();
+
     return converter.convertStudentDetails(studentList, studentCoursesList);
   }
 
@@ -48,7 +50,7 @@ public class StudentService {
    * @param id 受講生ID
    * @return 受講生（単一）
    */
-  public StudentDetail searchStudent(int id) {
+  public StudentDetail searchStudent(String id) {
     Student student = repository.searchStudent(id);
     List<StudentCourse> studentCourseList = repository.searchStudentCourse(student.getId());
     return new StudentDetail(student, studentCourseList);
@@ -70,7 +72,7 @@ public class StudentService {
 
     Student student = studentDetail.getStudent();
 
-    repository.insert(student);
+    repository.registerStudent(student);
     studentDetail.getStudentCourseList().forEach(sc -> {
     initStudentsCourse(sc, student);
     repository.registerStudentCourse(sc);
@@ -103,4 +105,5 @@ public class StudentService {
     studentDetail.getStudentCourseList()
         .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
   }
+
 }
