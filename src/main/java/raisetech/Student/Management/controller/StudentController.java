@@ -1,140 +1,98 @@
 package raisetech.Student.Management.controller;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.Student.Management.StudentService;
-import raisetech.Student.Management.controller.converter.StudentConverter;
-import raisetech.Student.Management.data.Student;
-import raisetech.Student.Management.data.StudentsCourses;
 import raisetech.Student.Management.domain.StudentDetail;
+import raisetech.Student.Management.exception.TestException;
 
+/**
+ * 受講生の検索や登録、更新などを行うREST APIとして実行されるControllerです。
+ */
+@Validated
 @RestController
 public class StudentController {
 
+  /**
+   * 受講生サービス
+   */
   private StudentService service;
-  private StudentConverter converter;
 
+  /**
+   * コンストラクタ
+   *
+   * @param service 受講生サービス
+   */
   @Autowired
-  public StudentController(StudentService service, StudentConverter converter) {
+  public StudentController(StudentService service) {
     this.service = service;
-    this.converter = converter;
   }
 
+   /**
+   * 受講生詳細の一覧検索です。 全権検索を行うので、条件指定は行わないものになります。
+   * @return 受講生詳細一覧（全件）
+   */
   @GetMapping("/studentList")
-  public List<StudentDetail> getStudentList() {
-    List<Student> students = service.searchStudentList();
-    List<StudentsCourses> studentCourses = service.searchStudentCourseList();
-
-    return converter.convertStudentDetails(students, studentCourses);
+  public List<StudentDetail> getStudentList() throws TestException {
+    return service.searchStudentList();
   }
 
-  @GetMapping("/studentCourseList")
-  public List<StudentsCourses> getCourseList() {
-    return service.searchStudentCourseList();
+  /**
+   * 受講生詳細の検索です IDに紐づく任意の受講生の情報を取得します
+   *
+   * @param id 受講生ID
+   * @return 受講生（単一）
+   */
+  @GetMapping("/getStudent/{id}")
+  public StudentDetail getStudent(
+      @PathVariable @Pattern(regexp = "^\\d+$") @NotNull @Size(min = 1, max = 3, message = "1~100の数字を入力してください") String id) throws TestException {
+    return service.searchStudent(id);
   }
 
-  @GetMapping("/newStudent")
-  public String newStudent(Model model) {
-    StudentDetail detail = new StudentDetail();
-    detail.setStudent(new Student());
-
-    List<StudentsCourses> list = new ArrayList<>();
-    list.add(new StudentsCourses());
-    detail.setStudentsCourses(list);
-
-    model.addAttribute("studentDetail", detail);
-
-    return "registerStudent";
-  }
-
+  /**
+   * 受講生詳細の登録を行います。
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
   @PostMapping("/registerStudent")
-  public String registerStudent(@ModelAttribute StudentDetail detail, BindingResult result) {
-    if (result.hasErrors()) {
-      return "registerStudent";
-    }
-    //新規受講生登録する処理を実装する。
-    //コース情報も一緒に登録できるように実装する。コースは単体でよい。
+  public ResponseEntity<StudentDetail> registerStudent(
+      @RequestBody @Valid StudentDetail studentDetail) {
 
-    service.insertStudent(detail);
-    service.insertStudentCourse(detail);
-    return "redirect:/studentList";
+    StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
+    return ResponseEntity.ok(responseStudentDetail);
   }
 
-  @GetMapping("/alterStudentMenu")
-  public String getAlterStudentList(Model model) {
-    List<Student> students = service.searchStudentList();
-    List<StudentsCourses> studentCourses = service.searchStudentCourseList();
-
-    model.addAttribute("alterMenuStudentList",
-        converter.convertStudentDetails(students, studentCourses));
-    return "alterMenuStudentList";
-  }
-
-  @GetMapping("/alterStudent/{id}")
-  public String alterStudentForm(@PathVariable int id, Model model) {
-
-    Student student = service.findStudentById(id);
-    List<StudentsCourses> course = service.findStudentCourseById(id);
-
-    StudentDetail detail = new StudentDetail();
-    detail.setStudent(student);
-    detail.setStudentsCourses(course);
-
-    model.addAttribute("studentDetail", detail);
-    return "alterSelectStudentList";
-  }
-
-  @PostMapping("/alterStudent")
-  public ResponseEntity<String> alterStudent(@RequestBody StudentDetail detail) {
-    service.updateStudent(detail);
+  /**
+   * 受講生詳細の更新を行います キャンセルフラグの更新もここで行います。（論理削除）
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
+  @PutMapping("/updateStudent")
+  public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDetail studentDetail) {
+    service.updateStudent(studentDetail);
     return ResponseEntity.ok("更新処理が成功しました");
   }
 
-  @GetMapping("/deletedStudent")
-  public String getDeletedStudentList(Model model) {
-    List<Student> students = service.searchDeletedStudentList();
-    List<StudentsCourses> studentCourses = service.searchStudentCourseList();
-
-    model.addAttribute("deletedStudentList",
-        converter.convertStudentDetails(students, studentCourses));
-    return "deletedStudentList";
-  }
-
-  @GetMapping("/alterDeletedStudent")
-  public String alterDeletedStudent(Model model) {
-    List<Student> students = service.searchDeletedStudentList();
-    List<StudentsCourses> studentCourses = service.searchStudentCourseList();
-
-    model.addAttribute("alterDeletedStudent",
-        converter.convertStudentDetails(students, studentCourses));
-    return "alterDeletedStudent";
-  }
-
-  @PostMapping("/alterDeleteStudent/{id}")
-  public String alterDelete(@PathVariable int id, Model model) {
-
-    Student student = service.findStudentById(id);
-    //List<StudentsCourses> course = service.findStudentCourseById(id);
-
-    StudentDetail detail = new StudentDetail();
-    detail.setStudent(student);
-    //detail.setStudentsCourses(course);
-
-    model.addAttribute("studentDetail", detail);
-    service.alterDeleteStudent(detail);
-    return "redirect:/studentList";
+  @GetMapping("/errorCheck")
+  public void errorCheck() throws TestException {
+    throw new TestException("現在のこのAPIは利用できません。");
   }
 }
